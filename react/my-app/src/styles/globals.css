@@ -1,0 +1,174 @@
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+.download-btn {
+  background: green;
+  border: outset 1px lightgreen
+}
+
+
+.reset-btn {
+  background: red;
+  border: outset 1px rgb(192, 72, 72)
+}
+.ctrl-container {
+  display: flex;
+  flex-direction: row;
+  align-content: center;
+  align-items: flex-end;
+  margin-bottom: 20px;
+}
+.ctrl-container > div,.ctrl-container > div > div  {
+  display: inline-flex;
+  margin-left: 10px;
+}
+
+.btnX, .btnXP {
+  padding: 5px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.btnXP {
+  margin-left: 20px;
+}
+
+.json-load-success {
+  color: green;
+}
+
+.json-load-error {
+  color: red;
+}
+
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  html {
+    color-scheme: dark;
+  }
+}
+
+
+.level {
+  width: 1600px;
+}
+.level-row {
+  width: 100%;
+  height: 16px;
+}
+.level-col {
+  width: 16px;
+  height: auto;
+  aspect-ratio: 1;
+  display: inline-block;
+}
+.level-col.focus {
+  outline: solid 2px white;
+  z-index: 2;
+  position: relative;
+}
+.selectors {
+  margin-top: 20px;
+}
+.selectors .level-row {
+  height: auto;
+}
+.selectors .level-col.focus {
+  outline: none
+}
+.col-wrap:hover, .col-wrap.focus {
+  background-color: white;
+}
+.col-wrap {
+  display: inline-flex;
+  width: fit-content;
+  height: fit-content;
+  border: solid .5px white;
+  padding: 5px;
+  justify-content: center;
+}
+.level-col-1 { background: url('/tiles/tile_1.png') }
+.level-col-2 { background: url('/tiles/tile_2.png') }
+.level-col-3 { background: url('/tiles/tile_3.png') }
+.level-col-4 { background: url('/tiles/tile_4.png') }
+.level-col-5 { background: url('/tiles/tile_5.png') }
+.level-col-6 { background: url('/tiles/tile_6.png') }
+.level-col-7 { background: url('/tiles/tile_7.png') }
+.level-col-8 { background: url('/tiles/tile_8.png') }
+.level-col-9 { background: url('/tiles/tile_9.png') }
+.level-col-10 { background: url('/tiles/tile_10.png') }
+.level-col-11 { background: url('/tiles/tile_11.png') }
+.level-col-12 { background: url('/tiles/tile_12.png') }
+.level-col-13 { background: url('/tiles/tile_13.png') }
+.level-col-14 { background: url('/tiles/tile_14.png') }
+.level-col-15 { background: url('/tiles/tile_15.png') }
+.level-col-16 { background: url('/tiles/tile_16.png') }
+.level-col-17 { background: url('/tiles/tile_17.png') }
+.level-col-18 { background: url('/tiles/tile_18.png') }
+.level-col-19 { background: url('/tiles/tile_19.png') }
+.level-col-20 { background: url('/tiles/tile_20.png') }
+.level-col-21 { background: url('/tiles/tile_21.png') }
+.level-col-22 { background: url('/tiles/tile_22.png') }
+.level-col-23 { background: url('/tiles/tile_23.png') }
+.level-col-24 { background: url('/tiles/tile_24.png') }
+.level-col-25 { background: url('/tiles/tile_25.png') }
+.level-col-26 { background: url('/tiles/tile_26.png') }
+.level-col-27 { background: url('/tiles/tile_27.png') }
+.level-col-28 { background: url('/tiles/tile_28.png') }
+.level-col-29 { background: url('/tiles/tile_29.png') }
+.level-col-30 { background: url('/tiles/tile_30.png') }
+.level-col-31 { background: url('/tiles/tile_31.png') }
+.level-col-32 { background: url('/tiles/tile_32.png') }
+.level-col-33 { background: url('/tiles/tile_33.png') }
+.level-col-34 { background: url('/tiles/tile_34.png') }
+.level-col-35 { background: url('/tiles/tile_35.png') }
+.level-col-36 { background: url('/tiles/tile_36.png') }
+.level-col-37 { background: url('/tiles/tile_37.png') }
+.level-col-38 { background: url('/tiles/tile_38.png') }
+.level-col-39 { background: url('/tiles/tile_39.png') }
+.level-col-40 { background: url('/tiles/tile_40.png') }
+.level-col-41 { background: url('/tiles/tile_41.png') }
+.level-col-42 { background: url('/tiles/tile_42.png') }
+.level-col-43 { background: url('/tiles/tile_43.png') }
+.level-col-44 { background: url('/tiles/tile_44.png') }
+.level-col-45 { background: url('/tiles/tile_45.png') }
+.level-col-46 { background: url('/tiles/tile_46.png') }
+.level-col-47 { background: url('/tiles/tile_47.png') }
+.level-col-48 { background: url('/tiles/tile_48.png') }
+.level-col-49 { background: url('/tiles/tile_49.png') }
+.level-col-50 { background: url('/tiles/tile_50.png') }
+.level-col-51 { background: url('/tiles/tile_51.png') }
+.level-col-52 { background: url('/tiles/tile_52.png') }
