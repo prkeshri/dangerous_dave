@@ -3,6 +3,8 @@ import struct
 import os
 import colorama
 import base64
+import json
+import json_fix
 
 # Fine-tunables
 NORMAL_LEVELS_OFFSET = 0x26E0A
@@ -247,15 +249,18 @@ class WarpZoneInfo(object):
     """
 
     @staticmethod
-    def parse(bin_bytes):
+    def parse():
         """
             Parses all the warp zones from the binary bytes.
             Returns None for levels that do not have warp-zones.
         """
-
+        global bin_bytes
         # Extract per-level warp zone data 
         warp_zone_level_data_fmt = '<%dH%dH' % (NORMAL_LEVELS_NUM, NORMAL_LEVELS_NUM)
         warp_zone_level_data = struct.unpack(warp_zone_level_data_fmt, bin_bytes[WARP_ZONE_LEVELS_DATA_OFFSET:WARP_ZONE_LEVELS_DATA_OFFSET + struct.calcsize(warp_zone_level_data_fmt)])
+
+
+        warp_zone_level_data = ins_tup(warp_zone_level_data, 5, 68)
 
         # Extract the global data for warp zones
         warp_zone_start_y = pixel_to_tile_coord_y(struct.unpack('<H', bin_bytes[WARP_ZONE_START_Y_OFFSET:WARP_ZONE_START_Y_OFFSET + struct.calcsize('<H')])[0])
@@ -265,6 +270,21 @@ class WarpZoneInfo(object):
         warp_zone_mappings_fmt = '<%dH' % (NORMAL_LEVELS_NUM,)
         warp_mappings = struct.unpack(warp_zone_mappings_fmt, bin_bytes[WARP_ZONE_LEVEL_MAPPING_OFFSET:WARP_ZONE_LEVEL_MAPPING_OFFSET + struct.calcsize(warp_zone_mappings_fmt)])
         
+        warp_mappings = ins_tup(warp_mappings, 5 ,3)
+        # for i in range(NORMAL_LEVELS_NUM):
+        #     warp = warp_mappings[i]
+        #     if warp == 0:
+        #         warp = i - 1
+        #         if warp < 1: warp = 10
+        #         warp_mappings = ins_tup(warp_mappings, i ,warp)
+        #         warp_zone_level_data = ins_tup(warp_zone_level_data, NORMAL_LEVELS_NUM + 1, 100)
+
+
+        x = struct.pack(warp_zone_level_data_fmt, *warp_zone_level_data)
+        bin_bytes = bin_bytes[:WARP_ZONE_LEVELS_DATA_OFFSET] + x + bin_bytes[WARP_ZONE_LEVELS_DATA_OFFSET + struct.calcsize(warp_zone_level_data_fmt):]
+        
+        x = struct.pack(warp_zone_mappings_fmt, *warp_mappings)
+        bin_bytes = bin_bytes[:WARP_ZONE_LEVEL_MAPPING_OFFSET] + x + bin_bytes[WARP_ZONE_LEVEL_MAPPING_OFFSET + struct.calcsize(warp_zone_mappings_fmt):]
         # Return all parsed warp zones
         zones = []
         for i in range(NORMAL_LEVELS_NUM):
@@ -286,6 +306,16 @@ class WarpZoneInfo(object):
         self.init_motion = init_motion
         self.warp_level = warp_level
 
+    def __json__(self):
+        obj = {
+            "startx": self.startx,
+            "starty": self.starty,
+            "init_motion": self.init_motion,
+            "warp_level": self.warp_level,
+        }
+        
+        return obj
+
     def __str__(self):
         """
             Returns a nice text-representation of the warp-zone information.
@@ -306,23 +336,23 @@ class Level(object):
         """
 
         # Start with the special level
-        levels = [ Level(bin_bytes[SPECIAL_LEVEL_OFFSET:SPECIAL_LEVEL_OFFSET + SPECIAL_LEVEL_SIZE], 'Intro screen', SPECIAL_LEVEL_OFFSET) ]
+        levels = [ Level().init4(bin_bytes[SPECIAL_LEVEL_OFFSET:SPECIAL_LEVEL_OFFSET + SPECIAL_LEVEL_SIZE], 'Intro screen', SPECIAL_LEVEL_OFFSET) ]
 
         # Parse initial state for all normal levels
         init_states_fmt = '<%dB%dH%dH' % (NORMAL_LEVELS_NUM, NORMAL_LEVELS_NUM, NORMAL_LEVELS_NUM)
         init_states = struct.unpack(init_states_fmt, bin_bytes[NORMAL_LEVELS_INIT_STATE_OFFSET:NORMAL_LEVELS_INIT_STATE_OFFSET + struct.calcsize(init_states_fmt)])
 
         # Parse warp zones for normal levels
-        warp_zones = WarpZoneInfo.parse(bin_bytes)
+        warp_zones = WarpZoneInfo.parse()
 
         # Parse normal levels
         for i in range(NORMAL_LEVELS_NUM):
             data = bin_bytes[NORMAL_LEVELS_OFFSET + (NORMAL_LEVELS_SIZE*i):NORMAL_LEVELS_OFFSET + NORMAL_LEVELS_SIZE*(i+1)]
             init_motion, startx, starty = init_states[i], pixel_to_tile_coord_x(init_states[NORMAL_LEVELS_NUM + i]), pixel_to_tile_coord_y(init_states[2*NORMAL_LEVELS_NUM + i])
-            levels.append(Level(data, 'Level %d' % (i+1,), NORMAL_LEVELS_OFFSET + (NORMAL_LEVELS_SIZE*i), startx, starty, MOTION_FLAG_MAPPINGS[init_motion], warp_zones[i]))
+            levels.append(Level().init4(data, 'Level %d' % (i+1,), NORMAL_LEVELS_OFFSET + (NORMAL_LEVELS_SIZE*i), startx, starty, MOTION_FLAG_MAPPINGS[init_motion], warp_zones[i]))
 
         # Parse the buggy warp zone level
-        levels.append(Level(bin_bytes[BUGGY_LEVEL_OFFSET:BUGGY_LEVEL_OFFSET + BUGGY_LEVEL_SIZE], 'Buggy warp level', BUGGY_LEVEL_OFFSET))
+        levels.append(Level().init4(bin_bytes[BUGGY_LEVEL_OFFSET:BUGGY_LEVEL_OFFSET + BUGGY_LEVEL_SIZE], 'Buggy warp level', BUGGY_LEVEL_OFFSET))
 
         # Return all the levels
         return levels
@@ -338,7 +368,7 @@ class Level(object):
             return f'{WHITE_BACK}{BRIGHT}?{RESET_COLORS}'
         return TILES[index][1]
 
-    def __init__(self, level_bytes, level_title, tiles_offset, startx=0, starty=0, init_motion=None, warp_zone=None):
+    def init4(self, level_bytes, level_title, tiles_offset, startx=0, starty=0, init_motion=None, warp_zone=None):
         """
             Initializes.
         """
@@ -368,13 +398,60 @@ class Level(object):
         # Save warp zone (might be None)
         self.warp_zone = warp_zone
         
+        return self
+      
+    def init2(self, obj):
+        self.width = int(obj.get('width'))
+        self.height = int(obj.get('height'))
+        self.tiles_offset = int(obj.get('tiles_offset'))
+        self.title = obj.get('title')
+        self.tiles = list(obj.get('tiles'))
+        self.path_data = bytes(obj.get('path_data'))
+        w = obj.get('warp_zone')
+        
+        if w is not None :
+            self.warp_zone = WarpZoneInfo(w.get('startx'), w.get('starty'), w.get('init_motion'), w.get('warp_level'))
+        else:
+            self.warp_zone = None
+        return self
+    
+    def __json__(self):
+        obj = { 
+            "path_data": list(map(int, [x for x in self.path_data])),
+            "tiles": self.tiles,
+            "width": str(self.width),
+            "height": str(self.height),
+            "tiles_offset": str(self.tiles_offset),
+            "title": self.title,
+            "warp_zone": self.warp_zone,
+        }
+        
+        return obj
+        
+        
     def __str__(self):
         """
             Returns a nice string-representation of the level.
         """
-        
         # Returns the text representation
-        self_repr = self.title + ':\n\n' + '\n'.join([ ''.join([ Level.get_tile(tile) for tile in self.tiles[i:i+self.width] ]) for i in range(0, len(self.tiles), self.width) ])
+        self_repr = self.title + ':\n\n '
+        for i in range(self.width):
+            if i%10 == 0:
+                self_repr += str(int(i/10))
+            else:
+                self_repr += ' '
+        self_repr += '\n '
+        for i in range(self.width):    
+            self_repr += str(i%10) 
+
+        self_repr += '\n'
+        
+        for i in range(0, len(self.tiles), self.width):
+            self_repr += str(int(i/self.width))
+            for tile in self.tiles[i:i+self.width]:
+                self_repr += Level.get_tile(tile)
+            self_repr += '\n'
+        
         if self.warp_zone is not None:
             self_repr += '\n\n%s' % (self.warp_zone,)
         return self_repr
@@ -403,11 +480,13 @@ def get_coord(coord_type, max_num):
     else:
         raise Exception('Invalid %s coordinate: %s.' % (coord_type, coord))
 
+bin_bytes = None
 def main():
     """
         Main functionality.
     """
 
+    global bin_bytes
     # Handle critical errors
     try:
 
@@ -441,7 +520,7 @@ def main():
             print(f'Current intro subtitle: {BLUE_FORE}{BRIGHT}"{titles[1]}"{RESET_COLORS}.')
             if not saved:
                 print(f'You have {RED_FORE}UNSAVED{RESET_COLORS} edits.\n')
-            print(f'\n{YELLOW_FORE}== MENU =={RESET_COLORS}\n\t[{YELLOW_FORE}V{RESET_COLORS}]iew a level.\n\t[{YELLOW_FORE}E{RESET_COLORS}]dit a level.\n\tEdit intro [{YELLOW_FORE}T{RESET_COLORS}]itle.\n\tEdit intro su[{YELLOW_FORE}B{RESET_COLORS}]title.\n\t[{YELLOW_FORE}S{RESET_COLORS}]ave pending changes.\n\t[{YELLOW_FORE}Q{RESET_COLORS}]uit without saving.')
+            print(f'\n{YELLOW_FORE}== MENU =={RESET_COLORS}\n\t[{YELLOW_FORE}V{RESET_COLORS}]iew a level.\n\t[{YELLOW_FORE}E{RESET_COLORS}]dit a level.\n\tEdit intro [{YELLOW_FORE}T{RESET_COLORS}]itle.\n\tEdit intro su[{YELLOW_FORE}B{RESET_COLORS}]title.\n\t[{YELLOW_FORE}S{RESET_COLORS}]ave pending changes.\n\t[{YELLOW_FORE}Q{RESET_COLORS}]uit without saving.\n\n{YELLOW_FORE}== JSON =={RESET_COLORS}\n\t[{YELLOW_FORE}J{RESET_COLORS}]son dump into dave.json.\n\t[{YELLOW_FORE}L{RESET_COLORS}]oad from dave.json.')
             choice = input('> ').upper()
            
             # Handle title or subtitle changes
@@ -490,7 +569,8 @@ def main():
             # Handle saving
             if choice == 'S':
                 if saved:
-                    raise Exception('Nothing to save.')
+                    print('Nothing to save.')
+                    continue
                 choice = input(f'This will completely override file %s! Choose \'{YELLOW_FORE}Y{RESET_COLORS}\' to do it or any key to cancel: ' % (FILENAME,)).upper()
                 if choice != 'Y':
                     continue
@@ -515,6 +595,28 @@ def main():
                 print('Quitting.\n')
                 break
             
+            if choice == 'J':
+                jd = json.dumps(
+                    levels,
+                    sort_keys=True,
+                    indent=4
+                ) 
+                with open("dave.json", 'w') as f:
+                    f.write(jd)
+                print(f"Write Successful to dave.json. Now, open this file in browser, edit, download and overwrite in folder, load with '{YELLOW_FORE}L{RESET_COLORS}' option and save dave.exe.\n\n")
+                continue
+
+            if choice == 'L':
+                with open('dave.json') as json_data:
+                    d = json.load(json_data)
+
+                levels = []
+                for level in d:
+                    levels.append(Level().init2(level))
+                print(f"Load Successful from dave.json! You may save with '{YELLOW_FORE}S{RESET_COLORS}' option.\n\n")
+                saved = False
+                continue
+
             # Default handling
             raise Exception('Invalid option: %s\n' % (choice,))
 
@@ -524,6 +626,11 @@ def main():
             print(ex)
 
 
+
+def ins_tup(tuple, i, value): 
+
+    tuple = tuple[:i] + (value,) + tuple[i+1:]
+    return tuple
+
 if __name__ == '__main__':
     main()
-
