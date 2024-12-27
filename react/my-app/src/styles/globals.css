@@ -81,10 +81,6 @@ a {
   }
 }
 
-
-.level {
-  width: 1600px;
-}
 .level-row {
   width: 100%;
   height: 16px;
@@ -119,6 +115,30 @@ a {
   border: solid .5px white;
   padding: 5px;
   justify-content: center;
+}
+
+.level {
+  width: 1600px;
+}
+.level-warp-start {
+  border-left: solid 2px blue;
+}
+
+.level-warp-pre {
+  opacity: .6;
+}
+
+
+.level-warp-pre.focus {
+  outline-color: blue
+}
+.level-warp-dave-start {
+  background: url('/dave_straight.png')!important;
+  background-size: 100% 100%!important
+}
+.level-dave-start {
+  background: url('/dave.png')!important;
+  background-size: 100% 100%!important
 }
 .level-col-1 { background: url('/tiles/tile_1.png') }
 .level-col-2 { background: url('/tiles/tile_2.png') }

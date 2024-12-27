@@ -1,21 +1,19 @@
 
 export interface Level {
     num: number
-    height: string
-    path_data: string[]
-    tiles: string[]
-    tiles_offset: string
-    title: string
-    warp_zone?: WarpZone
-    width: string
+    path_data: number[]
+    tiles: number[]
+    warp_zone?: WarpZone | null
     rows: number
     cols: number
+
+    startx: number
+    starty: number
 }
 
 export interface WarpZone {
-    init_motion: string
-    startx: number
-    starty: number
+    zoneStartx: number
+    daveStartx: number
     warp_level: number
 }
 
@@ -46,6 +44,8 @@ export interface Pos {
 
     level?: Level;
     tile?: any;
+
+    warpOf?: Level;
 }
 
 export interface MCTX {
@@ -54,4 +54,10 @@ export interface MCTX {
     onKeys: Function;
 
     Wrapper?: any;
+}
+
+export interface TileValue {
+    i: number;
+    l: number;
+    q: number[];
 }

@@ -1,13 +1,12 @@
 import { createContext, JSX, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import classNames from 'classnames';
-import { JsonEditor } from 'json-edit-react'
 import l from "../../../../dave.json"
-import { init, Level, MCTX, Pos, WarpZone } from './level'
-let initLevels: Level[] = init(l as Level[]);
+import { init, Level, MCTX, Pos, TileValue, WarpZone } from './level'
+let initLevels: Level[] = init(l as unknown as Level[]);
 let levels: Level[] = init(JSON.parse(JSON.stringify(l)));
 const mCtx = createContext<MCTX>({ setSelected: () => { }, pos: {}, onKeys: () => { } });
 const details: any = {};
-const tileValues: Record<string, any> = {};
+const tileValues: Record<string, TileValue> = {};
 
 function toStorage(lvl: number) {
     window.localStorage.setItem(`level-${lvl}`, JSON.stringify(levels[lvl]));
@@ -37,6 +36,9 @@ function fromStorage() {
 function Clicker({ children, keysListener = true, onKeys: onKeysIn, onNewPos, ctx: setCtx }: { children: any; keysListener?: boolean; onNewPos?: Function; onKeys?: Function; ctx?: Function }) {
     const [pos, setPos] = useState<Pos>({});
     const setSelected = ((t: any) => {
+        if (t.warpOf) {
+            t.row = 0;
+        }
         setPos({
             ...pos,
             ...t,
@@ -55,7 +57,8 @@ function Clicker({ children, keysListener = true, onKeys: onKeysIn, onNewPos, ct
         const { row = 0, col = 0, rows = 0, cols = 0 } = pos;
         let nRow = row, nCol = col;
         const tileI = row * cols + col;
-        const num = pos.level?.num as number;
+        const { level, warpOf } = pos;
+        const { num = -1 } = level ?? {};
         switch (event.key) {
             case "ArrowLeft":
                 // Left pressed
@@ -67,15 +70,64 @@ function Clicker({ children, keysListener = true, onKeys: onKeysIn, onNewPos, ct
                 break;
             case "ArrowUp":
                 // Up pressed
-                nRow--;
+                if (!warpOf) {
+                    nRow--;
+                }
                 break;
             case "ArrowDown":
                 // Down pressed
-                nRow++;
+                if (!warpOf) {
+                    nRow++;
+                }
                 break;
+            case "B":
+            case "b": {
+                if (!warpOf) {
+                    return;
+                }
+                const { warp_zone: _warp } = warpOf;
+                const warp = _warp as WarpZone;
+                if(col > warp.zoneStartx + warp.daveStartx) {
+                    return;
+                }
+                const diff = warp.zoneStartx - col;
+                warp.zoneStartx = col;
+                warp.daveStartx += diff;
+                toStorage(warpOf.num);
+                setPos({ ...pos }); // Just to trigger rerender!
+
+                event.preventDefault();
+            }
+                break;
+            case "S":
+            case "s": {
+                if (warpOf) {
+                    const { warp_zone: _warp } = warpOf;
+                    const warp = _warp as WarpZone;
+                    if (col < warp.zoneStartx) {
+                        return;
+                    }
+                    const diff = col - warp.zoneStartx;
+                    warp.daveStartx = diff;
+                    toStorage(warpOf.num);
+                } else if (level) {
+                    level.startx = col;
+                    level.starty = row;
+                    toStorage(num);
+                } else {
+                    break;
+                }
+                setPos({ ...pos }); // Just to trigger rerender!
+
+                event.preventDefault();
+                break;
+            }
             case " ":
                 {
-                    const { sym } = details
+                    if (warpOf) {
+                        break;
+                    }
+                    const { sym } = details;
                     const currentValue = levels[num].tiles[tileI];
                     if (sym === undefined || currentValue == sym) {
                         break;
@@ -179,7 +231,7 @@ export default function Comp() {
     const fileInputMsgRef = useRef<HTMLSpanElement>(null);
     useEffect(() => {
         const load = fromStorage();
-        if(load) {
+        if (load) {
             const fileInputMsg = fileInputMsgRef.current as NonNullable<HTMLSpanElement>;
             fileInputMsg.textContent = "Retrieved from Local Storage!";
             fileInputMsg.className = 'json-load-success';
@@ -255,26 +307,18 @@ export default function Comp() {
 }
 
 function Levels({ lvl, isWarp }: { lvl?: number; isWarp?: boolean }) {
-    const [currLevel, setCurrLevel] = useState(5);
+    const [currLevel, setCurrLevel] = useState(1);
     const [rx, rerender] = useState(0);
+    const wLvl = useRef<HTMLInputElement>(null);
     const bClick = (incDec: number) => {
         let nextLevel = currLevel + incDec;
         if (nextLevel >= 0 && nextLevel <= 11) setCurrLevel(nextLevel);
     }
     const level = levels[lvl ?? currLevel];
-    const l = <LevelComp level={level} />;
-    const [editor, setEditor] = useState(<></>);
-    useEffect(() => {
-        const ed = <div><JsonEditor
-            data={jsonLevel}
-            setData={(l) => { levels[currLevel] = { ...level, ...(l as object) }; toStorage(currLevel); }}
-        /></div>;
-        setEditor(ed);
-    }, [level])
 
     const download = () => {
         // Convert the JSON content to a string and create a Blob
-        const jsonStr = JSON.stringify(levels);
+        const jsonStr = JSON.stringify(levels, null, 4);
         const blob = new Blob([jsonStr], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
 
@@ -303,28 +347,73 @@ function Levels({ lvl, isWarp }: { lvl?: number; isWarp?: boolean }) {
         rerender(x => x + 1);
     }
 
-    const { path_data, tiles, num, height, rows, cols, width, ...jsonLevel } = level ?? {}
+    const changeWarp = (value$: string) => {
+        if (value$ === '') {
+            return;
+        }
+
+        let value = parseInt(value$);
+        if (value > 10 || value < 0) {
+            return;
+        }
+        const cMSg = value === 0 ? "Are you sure want to remove warp zone?" : "Are you sure want to change warp to level: " + value;
+        if (!confirm(cMSg)) {
+            return;
+        }
+
+
+        if (value === 0) {
+            level.warp_zone = null;
+        } else {
+            if (!level.warp_zone) {
+                level.warp_zone = {
+                    zoneStartx: 0,
+                    daveStartx: 0,
+                    warp_level: value,
+                }
+            } else {
+                level.warp_zone.warp_level = value;
+            }
+        }
+        toStorage(level.num);
+        setWLvTmpl(value + '');
+        rerender(x => x + 1);
+    }
     let warpInfo;
 
-    // SKIP
-    if (false && !isWarp && level.warp_zone) {
-        warpInfo = <div>< hr />
-            <h2>Warp Zone:</h2><div style={{ overflow: 'scroll' }}>
-                <LevelComp level={levels[level.warp_zone.warp_level]} warp={level.warp_zone} />
+    const [wLvlTmp, setWLvTmpl] = useState('');
+    useEffect(() => {
+        setWLvTmpl((level.warp_zone?.warp_level ?? '') + '');
+    }, [level.warp_zone?.warp_level]);
+    if (!isWarp && level.warp_zone) {
+        warpInfo = <>
+            <ul style={{ fontSize: 15, marginLeft: 20 }}>
+                <li>Can only change dave start point at the first row.</li>
+                <li>If you want to change dave before start point, first change start point by pressing 'B'</li>
+                <li>Cannot change start point after dave point!</li>
+                <li>Warp level info will be shown below (if applicable). Press 'S' to make dave start at that point in warp level!</li>
+                <li>Select a level.</li>
+            </ul>
+            <div style={{ overflow: 'scroll' }}>
+                <LevelComp level={levels[level.warp_zone.warp_level]} warpOf={level} />
             </div>
-        </div>
+        </>
     }
+
+
+    const ctx = useContext(mCtx);
     return <>
         <div key={rx}>
             <h2 className='ctrl-container'>
-                <div>
+                <div style={{ minWidth: '50%' }}>
                     <div>
                         <div>
-                            <ul style={{ width: '4in', fontSize: 15 }}>
+                            <ul style={{ fontSize: 15, marginLeft: 20 }}>
                                 <li>Select a level.</li>
                                 <li>Click any tile item from below.</li>
                                 <li>Use arrow keys or click on any tile to edit.</li>
-                                <li>Press space to apply, Ctrl+z to undo, Ctrl+y to redo!</li>
+                                <li>Press space to apply, Ctrl+z to undo, Ctrl+y to redo for that tile!</li>
+                                <li>Press 'S' to make dave start at that point!</li>
                                 <li>Download the json and load using dave_parse.py!</li>
                             </ul>
                             <hr style={{ marginTop: 10, marginBottom: 10 }} />
@@ -336,13 +425,8 @@ function Levels({ lvl, isWarp }: { lvl?: number; isWarp?: boolean }) {
                         </div>
                     </div>
                 </div>
-                <div style={{ width: 'fit-content', height: 180, overflow: 'auto' }}>
-                    {editor}
-                </div>
-                <div>
-                    <button className='btnXP download-btn' onClick={() => download()}>⬇️ Download</button>
-                </div>
                 <div style={{ flex: 1, justifyContent: 'flex-end', paddingRight: 20 }}>
+                    <button className='btnXP download-btn' onClick={() => download()}>⬇️ Download <small>dave.json</small></button>
                     <button className='btnXP reset-btn' onClick={() => resetLevel()}>RESET LEVEL</button>
                     <button className='btnXP reset-btn' onClick={() => resetAll()}>RESET ALL</button>
                 </div>
@@ -351,15 +435,21 @@ function Levels({ lvl, isWarp }: { lvl?: number; isWarp?: boolean }) {
         <hr style={{ margin: '10px 0px' }} />
         <div style={{ overflow: 'scroll' }}>
             <div>
-                {l}
+                <LevelComp level={level} />
             </div>
         </div>
-        {warpInfo}
+        <div>< hr />
+            <div><h2 style={{ display: 'inline-block' }}>Warp Zone:</h2> <input type="number" ref={wLvl} value={wLvlTmp} onChange={e => setWLvTmpl(e.target.value)} min={0} max={10} style={{ width: 40 }} /> <button onClick={e => changeWarp(wLvl.current?.value ?? '')}>✔</button> (Enter 0 to reset)</div>
+            {warpInfo}
+        </div>
     </>
 }
 
 function Selectors() {
-    const tiles = ["0", "1", "2", "5", "6", "10", "15", "16", "17", "18", "20", "21", "22", "23", "25", "29", "30", "31", "32", "33", "34", "35", "36", "41", "42", "43", "44", "45", "46", "47", "49", "50", "51", "52"]
+    const tiles = [];
+    for (let i = 1; i < 53; i++) {
+        tiles.push(i);
+    }
     const l: Partial<Level> = {
         num: -1,
         tiles,
@@ -373,8 +463,7 @@ function Selectors() {
         </div>
     </>
 }
-function LevelComp({ level, warp }: { level: Level; warp?: WarpZone }) {
-    let i = 0;
+function LevelComp({ level, warpOf }: { level: Level; warpOf?: Level }) {
     const tileRows = [];
     const { rows, cols, num, tiles } = level;
     const ctx = useContext(mCtx);
@@ -386,12 +475,13 @@ function LevelComp({ level, warp }: { level: Level; warp?: WarpZone }) {
             level,
         });
     }, [num]);
+    let i = 0;
     for (let row = 0; row < rows; row++) {
         const tileCols: JSX.Element[] = [];
         tileRows.push(<div className={`level-row level-row-${row}`}>{tileCols}</div>);
         for (let col = 0; col < cols; col++, i++) {
             const tileHash = tiles[i];
-            tileCols.push(<Tile row={row} warp={warp} col={col} tileHash={tileHash} tileI={i} level={level} />);
+            tileCols.push(<Tile row={row} warpOf={warpOf} col={col} tileHash={tileHash} tileI={i} level={level} />);
         }
     }
     return <div style={{ zoom: 2 }} className={`level level-${level.num}`}>
@@ -399,11 +489,12 @@ function LevelComp({ level, warp }: { level: Level; warp?: WarpZone }) {
     </div>;
 }
 
-function Tile(props: { warp?: WarpZone; row: number; col: Number; tileHash: string; tileI: number; level: Level }) {
-    const { row, col, tileHash, level, warp } = props;
+function Tile(props: { warpOf?: Level; row: number; col: number; tileHash: number; tileI: number; level: Level }) {
+    const { row, col, tileHash, level, warpOf } = props;
     const ctx = useContext(mCtx);
     const { Wrapper = ({ children }: { children: any; }) => <>{children}</> } = ctx;
     const { pos } = ctx;
+    const { warp_zone: warp } = warpOf ?? {}
     return <Wrapper className={
         classNames({
             focus: pos.type === 'tile' && pos.col === col && pos.row === row
@@ -412,9 +503,12 @@ function Tile(props: { warp?: WarpZone; row: number; col: Number; tileHash: stri
         <div onClick={(e) => ctx.setSelected({ type: 'tile', ...props, tile: e.target })} className={
             classNames('level-col',
                 {
-                    [`level-col-${tileHash}`]: tileHash !== '0',
+                    [`level-col-${tileHash}`]: tileHash !== 0,
                     focus: pos.level?.num === level.num && pos.type === 'tile' && pos.col === col && pos.row === row,
-                    'level-warp': warp?.startx === col && warp?.starty === row
+                    'level-warp-dave-start': (warp?.daveStartx ?? -1) + (warp?.zoneStartx ?? 0) === col && row === 0,
+                    'level-dave-start': (!warp && level.startx === col && level.starty === row),
+                    'level-warp-start': warp?.zoneStartx === col,
+                    'level-warp-pre': (warp ? (col < warp.zoneStartx) : false),
                 },
             )} data-row={row} data-col={col} />
     </Wrapper>;
