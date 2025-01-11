@@ -1,8 +1,8 @@
 import { createContext, JSX, useContext, useEffect, useRef, useState } from 'react';
 import classNames from 'classnames';
-import { Level, MCTX, Pos, WarpZone } from './types';
-import { g, init } from "./utils";
-import { toStorage, fromStorage } from './storage';
+import { Level, MCTX, Pos, WarpZone } from '../utils/types';
+import { g, init } from "../utils/utils";
+import { toStorage, fromStorage } from '../utils/storage';
 
 const mCtx = createContext<MCTX>({ setSelected: () => { }, pos: {}, onKeys: () => { } });
 

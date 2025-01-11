@@ -1,9 +1,15 @@
 # Running and editing
 
-- Open () in the web browser and follow the instructions in the web page.
+- Extract the build.zip and deploy the out folder to a server. 
+- Alternative is to use static-server:
+    - Visit the out folder.
+    - Open command Prompt/ Terminal and type npx static-server
+    - Visit http://localhost:9080 in the web browser and follow the instructions in the web page.
+
 <br/>**Screenshot**:
  ![Web UI](../../screenshots/dave-trainer-web.png "Trainer Web Interface")
 - JSON can be exported, then imported via the Python program and saved to dave.exe; and viceversa.
+- The default JSON is added in the config.
 - Happy Editing and Playing.
 
 # Development
