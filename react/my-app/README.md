@@ -1,3 +1,13 @@
+# Running and editing
+
+- Open () in the web browser and follow the instructions in the web page.
+<br/>**Screenshot**:
+ ![Web UI](../../screenshots/dave-trainer-web.png "Trainer Web Interface")
+- JSON can be exported, then imported via the Python program and saved to dave.exe; and viceversa.
+- Happy Editing and Playing.
+
+# Development
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/pages/api-reference/create-next-app).
 
 ## Getting Started

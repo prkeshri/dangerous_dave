@@ -76,10 +76,7 @@
             18
         ],
         "tiles_offset": 155300,
-        "warp_zone": null,
-        "rows": 7,
-        "cols": 10,
-        "num": 0
+        "warp_zone": null
     },
     {
         "path_data": [
@@ -1345,10 +1342,7 @@
             18
         ],
         "tiles_offset": 159498,
-        "warp_zone": null,
-        "rows": 10,
-        "cols": 100,
-        "num": 1
+        "warp_zone": null
     },
     {
         "path_data": [
@@ -1609,8 +1603,8 @@
             100,
             10
         ],
-        "startx": 2,
-        "starty": 4,
+        "startx": 1,
+        "starty": 8,
         "tiles": [
             17,
             17,
@@ -2614,10 +2608,7 @@
             22
         ],
         "tiles_offset": 160778,
-        "warp_zone": null,
-        "rows": 10,
-        "cols": 100,
-        "num": 2
+        "warp_zone": null
     },
     {
         "path_data": [
@@ -3883,10 +3874,7 @@
             22
         ],
         "tiles_offset": 162058,
-        "warp_zone": null,
-        "rows": 10,
-        "cols": 100,
-        "num": 3
+        "warp_zone": null
     },
     {
         "path_data": [
@@ -4670,7 +4658,7 @@
             0,
             0,
             0,
-            20,
+            0,
             5,
             0,
             0,
@@ -5152,10 +5140,7 @@
             5
         ],
         "tiles_offset": 163338,
-        "warp_zone": null,
-        "rows": 10,
-        "cols": 100,
-        "num": 4
+        "warp_zone": null
     },
     {
         "path_data": [
@@ -6422,13 +6407,10 @@
         ],
         "tiles_offset": 164618,
         "warp_zone": {
-            "daveStartx": 11,
+            "daveStartx": 42,
             "warp_level": 2,
             "zoneStartx": 9
-        },
-        "rows": 10,
-        "cols": 100,
-        "num": 5
+        }
     },
     {
         "path_data": [
@@ -7694,10 +7676,7 @@
             29
         ],
         "tiles_offset": 165898,
-        "warp_zone": null,
-        "rows": 10,
-        "cols": 100,
-        "num": 6
+        "warp_zone": null
     },
     {
         "path_data": [
@@ -8963,10 +8942,7 @@
             5
         ],
         "tiles_offset": 167178,
-        "warp_zone": null,
-        "rows": 10,
-        "cols": 100,
-        "num": 7
+        "warp_zone": null
     },
     {
         "path_data": [
@@ -9227,8 +9203,8 @@
             100,
             10
         ],
-        "startx": 80,
-        "starty": 1,
+        "startx": 2,
+        "starty": 8,
         "tiles": [
             1,
             30,
@@ -10236,10 +10212,7 @@
             "daveStartx": 67,
             "warp_level": 6,
             "zoneStartx": 4
-        },
-        "rows": 10,
-        "cols": 100,
-        "num": 8
+        }
     },
     {
         "path_data": [
@@ -11509,10 +11482,7 @@
             "daveStartx": 71,
             "warp_level": 7,
             "zoneStartx": 9
-        },
-        "rows": 10,
-        "cols": 100,
-        "num": 9
+        }
     },
     {
         "path_data": [
@@ -12782,10 +12752,7 @@
             "daveStartx": 11,
             "warp_level": 1,
             "zoneStartx": 9
-        },
-        "rows": 10,
-        "cols": 100,
-        "num": 10
+        }
     },
     {
         "path_data": [
@@ -14051,9 +14018,6 @@
             0
         ],
         "tiles_offset": 169003,
-        "warp_zone": null,
-        "rows": 10,
-        "cols": 100,
-        "num": 11
+        "warp_zone": null
     }
 ]

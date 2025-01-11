@@ -269,9 +269,20 @@ export default function Comp() {
     };
 
     return <>
-        <div style={{ margin: 20 }}>
-            Load JSON: <input type="file" onChange={loadFile} accept=".json"></input>&nbsp;&nbsp;<span ref={fileInputMsgRef} />
-            <hr />
+        <div style={{ height: 76 }}>
+            <div className='top-container'>
+                <hr className='top-bar' style={{ top: '42%' }} />
+                <hr className='top-bar' style={{ top: '45%' }} />
+                <div className='top-header-container'>
+                    <img src="/icon-big.png" style={{ marginBottom: 5, width: 100, background: 'black', padding: '10px 10px 0' }} />
+                    <h2 className="top-header">DAVE EDITOR</h2>
+                </div>
+            </div>
+        </div>
+        <div style={{ position: 'relative', margin: 20 }}>
+            <div>
+                <div>Load JSON: <input type="file" onChange={loadFile} accept=".json"></input>&nbsp;&nbsp;<span ref={fileInputMsgRef} /></div>
+            </div>
         </div>
         {<div key={rx}>
             <Clicker>
@@ -391,15 +402,17 @@ function LevelController({ lvl, isWarp }: { lvl?: number; isWarp?: boolean }) {
                 <div style={{ minWidth: '50%' }}>
                     <div>
                         <div>
-                            <ul style={{ fontSize: 15, marginLeft: 20 }}>
-                                <li>Select a level.</li>
-                                <li>Click any tile item from below.</li>
-                                <li>Use arrow keys or click on any tile to edit.</li>
-                                <li>Press space to apply, Ctrl+z to undo, Ctrl+y to redo for that tile!</li>
-                                <li>Press 'S' to make dave start at that point!</li>
-                                <li>Download the json and load using dave_parse.py!</li>
-                            </ul>
-                            <hr style={{ marginTop: 10, marginBottom: 10 }} />
+                            <div style={{ display: 'flex' }}>
+                                <ul style={{ fontSize: 15, marginLeft: 20 }}>
+                                    <li>Select a level.</li>
+                                    <li>Click any tile item from below.</li>
+                                    <li>Use arrow keys or click on any tile to edit.</li>
+                                    <li>Press space to apply, Ctrl+z to undo, Ctrl+y to redo for that tile!</li>
+                                    <li>Press 'S' to make dave start at that point!</li>
+                                    <li>Download the json and load using dave_parse.py!</li>
+                                </ul>
+                            </div>
+                            <div style={{ height: 20 }} />
                             <div style={{ display: 'flex' }}>
                                 LEVEL&nbsp;
                                 <button className='btnX' onClick={() => bClick(-1)}>&lt;</button>&nbsp;{currLevel}&nbsp;
