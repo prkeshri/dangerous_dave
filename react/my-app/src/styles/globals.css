@@ -1,6 +1,15 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+
+  --tile-img-dim: 30px;
+
+  --tile-div-pad: calc(var(--tile-img-dim)/15); 
+  --tile-img-width: var(--tile-img-dim);
+  --tile-img-height: var(--tile-img-dim);
+
+  --tile-div-width: calc(var(--tile-img-width) - var(--tile-div-pad));
+  --tile-div-height: calc(var(--tile-img-height) - var(--tile-div-pad));
 }
 
 @media (prefers-color-scheme: dark) {
@@ -83,15 +92,16 @@ a {
 
 .level-row {
   width: 100%;
-  height: 16px;
+  height: var(--tile-div-height);
 }
-.level-col {
-  width: 16px;
-  height: auto;
+
+.tile {
+  width: var(--tile-div-width);
+  height: var(--tile-div-height);
   aspect-ratio: 1;
   display: inline-block;
 }
-.level-col.focus {
+.tile.focus {
   outline: solid 2px white;
   z-index: 2;
   position: relative;
@@ -102,7 +112,7 @@ a {
 .selectors .level-row {
   height: auto;
 }
-.selectors .level-col.focus {
+.selectors .tile.focus {
   outline: none
 }
 .col-wrap:hover, .col-wrap.focus {
@@ -140,55 +150,60 @@ a {
   background: url('/dave.png')!important;
   background-size: 100% 100%!important
 }
-.level-col-1 { background: url('/tiles/tile_1.png') }
-.level-col-2 { background: url('/tiles/tile_2.png') }
-.level-col-3 { background: url('/tiles/tile_3.png') }
-.level-col-4 { background: url('/tiles/tile_4.png') }
-.level-col-5 { background: url('/tiles/tile_5.png') }
-.level-col-6 { background: url('/tiles/tile_6.png') }
-.level-col-7 { background: url('/tiles/tile_7.png') }
-.level-col-8 { background: url('/tiles/tile_8.png') }
-.level-col-9 { background: url('/tiles/tile_9.png') }
-.level-col-10 { background: url('/tiles/tile_10.png') }
-.level-col-11 { background: url('/tiles/tile_11.png') }
-.level-col-12 { background: url('/tiles/tile_12.png') }
-.level-col-13 { background: url('/tiles/tile_13.png') }
-.level-col-14 { background: url('/tiles/tile_14.png') }
-.level-col-15 { background: url('/tiles/tile_15.png') }
-.level-col-16 { background: url('/tiles/tile_16.png') }
-.level-col-17 { background: url('/tiles/tile_17.png') }
-.level-col-18 { background: url('/tiles/tile_18.png') }
-.level-col-19 { background: url('/tiles/tile_19.png') }
-.level-col-20 { background: url('/tiles/tile_20.png') }
-.level-col-21 { background: url('/tiles/tile_21.png') }
-.level-col-22 { background: url('/tiles/tile_22.png') }
-.level-col-23 { background: url('/tiles/tile_23.png') }
-.level-col-24 { background: url('/tiles/tile_24.png') }
-.level-col-25 { background: url('/tiles/tile_25.png') }
-.level-col-26 { background: url('/tiles/tile_26.png') }
-.level-col-27 { background: url('/tiles/tile_27.png') }
-.level-col-28 { background: url('/tiles/tile_28.png') }
-.level-col-29 { background: url('/tiles/tile_29.png') }
-.level-col-30 { background: url('/tiles/tile_30.png') }
-.level-col-31 { background: url('/tiles/tile_31.png') }
-.level-col-32 { background: url('/tiles/tile_32.png') }
-.level-col-33 { background: url('/tiles/tile_33.png') }
-.level-col-34 { background: url('/tiles/tile_34.png') }
-.level-col-35 { background: url('/tiles/tile_35.png') }
-.level-col-36 { background: url('/tiles/tile_36.png') }
-.level-col-37 { background: url('/tiles/tile_37.png') }
-.level-col-38 { background: url('/tiles/tile_38.png') }
-.level-col-39 { background: url('/tiles/tile_39.png') }
-.level-col-40 { background: url('/tiles/tile_40.png') }
-.level-col-41 { background: url('/tiles/tile_41.png') }
-.level-col-42 { background: url('/tiles/tile_42.png') }
-.level-col-43 { background: url('/tiles/tile_43.png') }
-.level-col-44 { background: url('/tiles/tile_44.png') }
-.level-col-45 { background: url('/tiles/tile_45.png') }
-.level-col-46 { background: url('/tiles/tile_46.png') }
-.level-col-47 { background: url('/tiles/tile_47.png') }
-.level-col-48 { background: url('/tiles/tile_48.png') }
-.level-col-49 { background: url('/tiles/tile_49.png') }
-.level-col-50 { background: url('/tiles/tile_50.png') }
-.level-col-51 { background: url('/tiles/tile_51.png') }
-.level-col-52 { background: url('/tiles/tile_52.png') }
+.tile {
+  background-image: url(/dave_tiles.png);
+  background-size: calc(20*var(--tile-img-width)) calc(3*var(--tile-img-height));
+}
+.tile-0 { background-position: 0 0}
+.tile-1 { background-position: calc(-1*var(--tile-img-width)) 0}
+.tile-2 { background-position: calc(-2*var(--tile-img-width)) 0}
+.tile-3 { background-position: calc(-3*var(--tile-img-width)) 0}
+.tile-4 { background-position: calc(-4*var(--tile-img-width)) 0}
+.tile-5 { background-position: calc(-5*var(--tile-img-width)) 0}
+.tile-6 { background-position: calc(-6*var(--tile-img-width)) 0}
+.tile-7 { background-position: calc(-7*var(--tile-img-width)) 0}
+.tile-8 { background-position: calc(-8*var(--tile-img-width)) 0}
+.tile-9 { background-position: calc(-9*var(--tile-img-width)) 0}
+.tile-10 { background-position: calc(-10*var(--tile-img-width)) 0}
+.tile-11 { background-position: calc(-11*var(--tile-img-width)) 0}
+.tile-12 { background-position: calc(-12*var(--tile-img-width)) 0}
+.tile-13 { background-position: calc(-13*var(--tile-img-width)) 0}
+.tile-14 { background-position: calc(-14*var(--tile-img-width)) 0}
+.tile-15 { background-position: calc(-15*var(--tile-img-width)) 0}
+.tile-16 { background-position: calc(-16*var(--tile-img-width)) 0}
+.tile-17 { background-position: calc(-17*var(--tile-img-width)) 0}
+.tile-18 { background-position: calc(-18*var(--tile-img-width)) 0}
+.tile-19 { background-position: calc(-19*var(--tile-img-width)) 0}
+.tile-20 { background-position: 0 calc(-1*var(--tile-img-height))}
+.tile-21 { background-position: calc(-1*var(--tile-img-width)) calc(-1*var(--tile-img-height))}
+.tile-22 { background-position: calc(-2*var(--tile-img-width)) calc(-1*var(--tile-img-height))}
+.tile-23 { background-position: calc(-3*var(--tile-img-width)) calc(-1*var(--tile-img-height))}
+.tile-24 { background-position: calc(-4*var(--tile-img-width)) calc(-1*var(--tile-img-height))}
+.tile-25 { background-position: calc(-5*var(--tile-img-width)) calc(-1*var(--tile-img-height))}
+.tile-26 { background-position: calc(-6*var(--tile-img-width)) calc(-1*var(--tile-img-height))}
+.tile-27 { background-position: calc(-7*var(--tile-img-width)) calc(-1*var(--tile-img-height))}
+.tile-28 { background-position: calc(-8*var(--tile-img-width)) calc(-1*var(--tile-img-height))}
+.tile-29 { background-position: calc(-9*var(--tile-img-width)) calc(-1*var(--tile-img-height))}
+.tile-30 { background-position: calc(-10*var(--tile-img-width)) calc(-1*var(--tile-img-height))}
+.tile-31 { background-position: calc(-11*var(--tile-img-width)) calc(-1*var(--tile-img-height))}
+.tile-32 { background-position: calc(-12*var(--tile-img-width)) calc(-1*var(--tile-img-height))}
+.tile-33 { background-position: calc(-13*var(--tile-img-width)) calc(-1*var(--tile-img-height))}
+.tile-34 { background-position: calc(-14*var(--tile-img-width)) calc(-1*var(--tile-img-height))}
+.tile-35 { background-position: calc(-15*var(--tile-img-width)) calc(-1*var(--tile-img-height))}
+.tile-36 { background-position: calc(-16*var(--tile-img-width)) calc(-1*var(--tile-img-height))}
+.tile-37 { background-position: calc(-17*var(--tile-img-width)) calc(-1*var(--tile-img-height))}
+.tile-38 { background-position: calc(-18*var(--tile-img-width)) calc(-1*var(--tile-img-height))}
+.tile-39 { background-position: calc(-19*var(--tile-img-width)) calc(-1*var(--tile-img-height))}
+.tile-40 { background-position: 0 calc(-2*var(--tile-img-height))}
+.tile-41 { background-position: calc(-1*var(--tile-img-width)) calc(-2*var(--tile-img-height))}
+.tile-42 { background-position: calc(-2*var(--tile-img-width)) calc(-2*var(--tile-img-height))}
+.tile-43 { background-position: calc(-3*var(--tile-img-width)) calc(-2*var(--tile-img-height))}
+.tile-44 { background-position: calc(-4*var(--tile-img-width)) calc(-2*var(--tile-img-height))}
+.tile-45 { background-position: calc(-5*var(--tile-img-width)) calc(-2*var(--tile-img-height))}
+.tile-46 { background-position: calc(-6*var(--tile-img-width)) calc(-2*var(--tile-img-height))}
+.tile-47 { background-position: calc(-7*var(--tile-img-width)) calc(-2*var(--tile-img-height))}
+.tile-48 { background-position: calc(-8*var(--tile-img-width)) calc(-2*var(--tile-img-height))}
+.tile-49 { background-position: calc(-9*var(--tile-img-width)) calc(-2*var(--tile-img-height))}
+.tile-50 { background-position: calc(-10*var(--tile-img-width)) calc(-2*var(--tile-img-height))}
+.tile-51 { background-position: calc(-11*var(--tile-img-width)) calc(-2*var(--tile-img-height))}
+.tile-52 { background-position: calc(-12*var(--tile-img-width)) calc(-2*var(--tile-img-height))}

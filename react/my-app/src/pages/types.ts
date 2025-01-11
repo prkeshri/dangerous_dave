@@ -17,20 +17,6 @@ export interface WarpZone {
     warp_level: number
 }
 
-export function init(levels: Level[]) {
-    levels.forEach((level, i) => {
-        if (i === 0) {
-            level.rows = 7;
-            level.cols = 10;
-        } else {
-            level.rows = 10;
-            level.cols = 100;
-        }
-        level.num = i;
-    });
-    return levels;
-}
-
 export interface Pos {
     type?: string;
     row?: number;
